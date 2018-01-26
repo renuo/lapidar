@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/renuo_blocks'
+
+RenuoBlocks.start_mining
+
+current_block = RenuoBlocks.last_block
+until current_block.nil?
+  puts current_block.data
+  current_block = current_block.previous
+end
