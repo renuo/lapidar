@@ -45,6 +45,7 @@ module RenuoBlocks
       parent_position = @blocks.count - 2
 
       while contested?(parent_position)
+        # TODO: Is there's a smarter way to persistently select a winner than sorting the competition
         @blocks[parent_position].sort_by! do |previous_block|
           Assessment.valid_link?(previous_block, winning_block) ? 0 : 1
         end
