@@ -1,37 +1,47 @@
-require 'thread'
 require_relative 'renuo_blocks/assessment'
 require_relative 'renuo_blocks/block'
 require_relative 'renuo_blocks/chain'
 require_relative 'renuo_blocks/miner'
 
+require 'json'
+
 module RenuoBlocks
-  def self.start_mining
+  def self.start_mining(port:, neighbors:)
+    chain = Chain.new
     miner = Miner.new
-    new_blocks = Queue.new
+    incoming_blocks = Queue.new
+
+    me = Buschtelefon::NetTattler.new(port: port)
+    neighbors.map! { |neighbor_location| Buschtelefon::RemoteTattler.new(neighbor_location) }
+    neighbors.each { |neighbor| me.connect(neighbor) }
+
+    Thread.abort_on_exception = true
 
     consumer = Thread.new do
       until_shutdown do
-        new_block = new_blocks.pop
+        chain.add(incoming_blocks.pop)
         print '+'
+      rescue
+
       end
     end
 
     network_producer = Thread.new do
       until_shutdown do
-        sleep 1
-        [Block.new(nil, '0001', 'net'), Block.new(nil, '0002', 'net')].each do |incoming_block|
-          new_blocks << incoming_block
+        me.listen do |message|
+          incoming_blocks << Block.new(JSON.parse(message, symbolize_names: true))
         end
       end
     end
 
     local_producer = Thread.new do
       until_shutdown do
-        new_block = miner.mine(last_block)
-        # publish block
-        print '⚒ '
+        new_block = miner.mine(chain.blocks.last)
 
-        new_blocks << new_block
+        me.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
+        incoming_blocks << new_block
+
+        print '⚒ '
       end
     end
 
@@ -40,14 +50,6 @@ module RenuoBlocks
     consumer.join
 
     puts "\nShutting down…"
-  end
-
-  def self.last_block
-    @last_block ||= nil
-  end
-
-  def self.known_blocks
-    @known_blocks || []
   end
 
   def self.until_shutdown(&block)

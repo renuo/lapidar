@@ -5,3 +5,5 @@ ruby File.read('.ruby-version')
 gem 'rspec'
 gem 'factory_bot', require: false
 gem 'simplecov', require: false
+
+gem 'buschtelefon', path: '../buschtelefon'

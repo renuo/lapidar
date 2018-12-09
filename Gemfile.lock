@@ -1,3 +1,8 @@
+PATH
+  remote: ../buschtelefon
+  specs:
+    buschtelefon (0.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -41,6 +46,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  buschtelefon!
   factory_bot
   rspec
   simplecov
