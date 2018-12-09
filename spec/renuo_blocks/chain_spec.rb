@@ -28,14 +28,14 @@ module RenuoBlocks
       end
 
       context 'when adding a fake genesis block' do
-        let(:incoming_block) { Block.new(0, '00000', 'genesis', 1) }
+        let(:incoming_block) { Block.new(number: 0, hash: '00000', nonce: 1, data: 'genesis') }
 
         it { is_expected.to raise_exception('invalid block') }
       end
 
       # [[0]] ⇒ raise
       context 'when given a late block after gaps' do
-        let(:incoming_block) { Block.new(42, '0000042', 'leviticus', 1) }
+        let(:incoming_block) { Block.new(number: 42, hash: '0000042', nonce: 1, data: 'leviticus') }
 
         before(:each) { instance.add(build(:genesis_block)) }
 

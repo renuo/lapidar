@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :block, class: RenuoBlocks::Block do
-    initialize_with { new(number, hash, nonce, data, created_at) }
+    initialize_with { new(attributes) }
 
     created_at Time.now.utc
 

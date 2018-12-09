@@ -17,7 +17,7 @@ module RenuoBlocks
       end
 
       context 'when genesis block has been mined' do
-        let(:base_block) { Block.new(1, '000', 0) }
+        let(:base_block) { Block.new(number: 1, hash: '000', nonce: 0) }
         it { is_expected.to be_a Block }
       end
     end

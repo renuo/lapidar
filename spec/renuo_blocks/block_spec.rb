@@ -1,7 +1,7 @@
 module RenuoBlocks
   RSpec.describe Block do
     describe '#new' do
-      subject { described_class.new(nil, 'abcdef', 0) }
+      subject { described_class.new(number: nil, hash: 'abcdef', nonce: 0) }
 
       it 'initializes' do
         expect(subject).not_to be_nil

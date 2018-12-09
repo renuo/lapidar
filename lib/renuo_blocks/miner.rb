@@ -7,10 +7,10 @@ module RenuoBlocks
     end
 
     def mine(base_block, data = '')
-      base_block = god unless base_block
+      base_block ||= god
       nonce = 0
       nonce += 1 until meets_difficulty?(digest(base_block, nonce, data))
-      Block.new(base_block.number + 1, digest(base_block, nonce, data), nonce, data)
+      Block.new(number: base_block.number + 1, hash: digest(base_block, nonce, data), nonce: nonce, data: data)
     end
 
     private
@@ -24,7 +24,8 @@ module RenuoBlocks
     end
 
     def god
-      Block.new(-1, nil, nil, nil) # Virtual block descending from Heaven to create the genesis block
+      # Virtual block descending from Heaven to create the genesis block
+      Block.new(number: -1, hash: nil, nonce: nil)
     end
   end
 end
