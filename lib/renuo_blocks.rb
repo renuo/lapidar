@@ -21,8 +21,7 @@ module RenuoBlocks
       until_shutdown do
         chain.add(incoming_blocks.pop)
         print '+'
-      rescue
-
+      rescue StandardError
       end
     end
 
@@ -52,7 +51,7 @@ module RenuoBlocks
     puts "\nShutting down…"
   end
 
-  def self.until_shutdown(&block)
+  def self.until_shutdown
     trap 'SIGINT' do
       puts "\nshutting down"
       exit

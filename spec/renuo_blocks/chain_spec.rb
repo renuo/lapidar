@@ -15,7 +15,7 @@ module RenuoBlocks
     end
 
     describe '#add' do
-      subject { lambda { instance.add(incoming_block) } }
+      subject { -> { instance.add(incoming_block) } }
 
       #        ↓
       # [] ⇒ [[0]]

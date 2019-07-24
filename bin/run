@@ -2,8 +2,8 @@
 
 require_relative '../lib/renuo_blocks'
 
-Thread.new { RenuoBlocks.start_mining(port: 9999, neighbors: [{host: 'localhost', port: 9998}]) }
-Thread.new { RenuoBlocks.start_mining(port: 9998, neighbors: [{host: 'localhost', port: 9999}]) }
+Thread.new { RenuoBlocks.start_mining(port: 9999, neighbors: [{ host: 'localhost', port: 9998 }]) }
+Thread.new { RenuoBlocks.start_mining(port: 9998, neighbors: [{ host: 'localhost', port: 9999 }]) }
 
 # current_block = RenuoBlocks.last_block
 # until current_block.nil?
