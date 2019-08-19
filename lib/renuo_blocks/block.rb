@@ -16,7 +16,7 @@ module RenuoBlocks
         hash: @hash,
         nonce: @nonce,
         data: @data,
-        created_at: @created_at
+        created_at: @created_at,
       }
     end
   end

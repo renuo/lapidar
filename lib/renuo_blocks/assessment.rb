@@ -5,7 +5,7 @@ module RenuoBlocks
     end
 
     def self.meets_difficulty?(block)
-      block.hash.start_with?('0000')
+      block.hash.start_with?("0000")
     end
 
     def self.genesis?(block)
@@ -13,7 +13,7 @@ module RenuoBlocks
     end
 
     def self.first?(block)
-      block.number == 0
+      block.number.zero?
     end
 
     def self.hash(previous_hash, nonce, data)

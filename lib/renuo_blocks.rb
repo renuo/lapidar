@@ -1,9 +1,10 @@
-require_relative 'renuo_blocks/assessment'
-require_relative 'renuo_blocks/block'
-require_relative 'renuo_blocks/chain'
-require_relative 'renuo_blocks/miner'
+require_relative "renuo_blocks/assessment"
+require_relative "renuo_blocks/block"
+require_relative "renuo_blocks/chain"
+require_relative "renuo_blocks/miner"
 
-require 'json'
+require "json"
+require "buschtelefon"
 
 module RenuoBlocks
   def self.start_mining(port:, neighbors:)
@@ -17,32 +18,33 @@ module RenuoBlocks
 
     Thread.abort_on_exception = true
 
-    consumer = Thread.new do
+    consumer = Thread.new {
       until_shutdown do
         chain.add(incoming_blocks.pop)
-        print '+'
-      rescue StandardError
+        print "+"
+      rescue
+        puts 'Consumer error'
       end
-    end
+    }
 
-    network_producer = Thread.new do
+    network_producer = Thread.new {
       until_shutdown do
         me.listen do |message|
           incoming_blocks << Block.new(JSON.parse(message, symbolize_names: true))
         end
       end
-    end
+    }
 
-    local_producer = Thread.new do
+    local_producer = Thread.new {
       until_shutdown do
         new_block = miner.mine(chain.blocks.last)
 
         me.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
         incoming_blocks << new_block
 
-        print '⚒ '
+        print "⚒ "
       end
-    end
+    }
 
     local_producer.join
     network_producer.join
@@ -52,7 +54,7 @@ module RenuoBlocks
   end
 
   def self.until_shutdown
-    trap 'SIGINT' do
+    trap "SIGINT" do
       puts "\nshutting down"
       exit
     end

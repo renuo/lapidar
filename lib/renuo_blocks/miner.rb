@@ -1,4 +1,4 @@
-require 'digest'
+require "digest"
 
 module RenuoBlocks
   class Miner
@@ -6,7 +6,7 @@ module RenuoBlocks
       @stomach = Digest::SHA2.new(256)
     end
 
-    def mine(base_block, data = '')
+    def mine(base_block, data = "")
       base_block ||= god
       nonce = 0
       nonce += 1 until meets_difficulty?(digest(base_block, nonce, data))
@@ -20,7 +20,7 @@ module RenuoBlocks
     end
 
     def meets_difficulty?(digest)
-      digest.start_with?('0000')
+      digest.start_with?("0000")
     end
 
     def god

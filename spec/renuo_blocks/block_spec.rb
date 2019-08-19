@@ -1,15 +1,17 @@
 module RenuoBlocks
   RSpec.describe Block do
-    describe '#new' do
-      subject { described_class.new(number: nil, hash: 'abcdef', nonce: 0) }
+    subject(:block) { described_class.new(number: nil, hash: "abcdef", nonce: 0) }
 
-      it 'initializes' do
-        expect(subject).not_to be_nil
-      end
+    describe "#new" do
+      it { is_expected.to be_a(Block) }
+      it { is_expected.to have_attributes(created_at: within(0.1).of(Time.now)) }
+    end
 
-      it 'sets block creation date and time' do
-        expect(subject.created_at).to be_within(0.1).of(Time.now)
-      end
+    describe "#to_h" do
+      subject(:to_h) { block.to_h }
+
+      it { is_expected.to be_a(Hash) }
+      it { is_expected.to include(:number, :hash, :nonce, :data, :created_at) }
     end
   end
 end

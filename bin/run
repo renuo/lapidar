@@ -1,12 +1,24 @@
 #!/usr/bin/env ruby
 
+require "bundler"
+Bundler.setup(:default)
+
 require_relative '../lib/renuo_blocks'
 
-Thread.new { RenuoBlocks.start_mining(port: 9999, neighbors: [{ host: 'localhost', port: 9998 }]) }
-Thread.new { RenuoBlocks.start_mining(port: 9998, neighbors: [{ host: 'localhost', port: 9999 }]) }
+puts 'Start experiment'
+
+[
+  Thread.new { RenuoBlocks.start_mining(port: 9999, neighbors: [{ host: 'localhost', port: 9995 }]) },
+  Thread.new { RenuoBlocks.start_mining(port: 9998, neighbors: [{ host: 'localhost', port: 9996 }]) },
+  Thread.new { RenuoBlocks.start_mining(port: 9997, neighbors: [{ host: 'localhost', port: 9997 }]) },
+  Thread.new { RenuoBlocks.start_mining(port: 9996, neighbors: [{ host: 'localhost', port: 9998 }]) },
+  Thread.new { RenuoBlocks.start_mining(port: 9995, neighbors: [{ host: 'localhost', port: 9999 }]) }
+].each(&:join)
 
 # current_block = RenuoBlocks.last_block
 # until current_block.nil?
 #   puts current_block.data
 #   current_block = current_block.previous
 # end
+
+puts 'Running…'
