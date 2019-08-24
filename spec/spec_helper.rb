@@ -14,6 +14,7 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require "bundler/setup"
 require "factory_bot"
 require "simplecov"
 SimpleCov.start

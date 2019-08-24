@@ -1,9 +1,14 @@
 RSpec.describe RenuoBlocks do
-  let(:instance) { described_class.new }
+  it 'runs' do
+    threads = [
+      Thread.new { RenuoBlocks.start_mining(port: 9999, neighbors: [{ host: 'localhost', port: 9995 }]) },
+      Thread.new { RenuoBlocks.start_mining(port: 9998, neighbors: [{ host: 'localhost', port: 9996 }]) },
+      Thread.new { RenuoBlocks.start_mining(port: 9997, neighbors: [{ host: 'localhost', port: 9997 }]) },
+      Thread.new { RenuoBlocks.start_mining(port: 9996, neighbors: [{ host: 'localhost', port: 9998 }]) },
+      Thread.new { RenuoBlocks.start_mining(port: 9995, neighbors: [{ host: 'localhost', port: 9999 }]) }
+    ]
 
-  describe "#start_mining" do
-    subject { instance }
-
-    it { is_expected.not_to be_nil }
+    sleep(2)
   end
 end
+

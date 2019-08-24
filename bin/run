@@ -5,7 +5,7 @@ Bundler.setup(:default)
 
 require_relative '../lib/renuo_blocks'
 
-puts 'Start experiment'
+puts 'Starting experiment…'
 
 [
   Thread.new { RenuoBlocks.start_mining(port: 9999, neighbors: [{ host: 'localhost', port: 9995 }]) },
@@ -15,10 +15,3 @@ puts 'Start experiment'
   Thread.new { RenuoBlocks.start_mining(port: 9995, neighbors: [{ host: 'localhost', port: 9999 }]) }
 ].each(&:join)
 
-# current_block = RenuoBlocks.last_block
-# until current_block.nil?
-#   puts current_block.data
-#   current_block = current_block.previous
-# end
-
-puts 'Running…'
