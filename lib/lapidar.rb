@@ -1,12 +1,13 @@
-require_relative "renuo_blocks/assessment"
-require_relative "renuo_blocks/block"
-require_relative "renuo_blocks/chain"
-require_relative "renuo_blocks/miner"
+require_relative "lapidar/assessment"
+require_relative "lapidar/block"
+require_relative "lapidar/chain"
+require_relative "lapidar/miner"
+require_relative "lapidar/version"
 
 require "json"
 require "buschtelefon"
 
-module RenuoBlocks
+module Lapidar
   def self.start_mining(port:, neighbors:)
     chain = Chain.new
     miner = Miner.new
@@ -20,27 +21,31 @@ module RenuoBlocks
 
     consumer = Thread.new {
       until_shutdown do
-        chain.add(incoming_blocks.pop)
-        print "+"
-      rescue
-        puts "Consumer error"
+        begin
+          chain.add(incoming_blocks.pop)
+          print "+"
+        rescue
+          puts "Consumer error"
+        end
       end
     }
 
     network_producer = Thread.new {
       until_shutdown do
         me.listen do |message|
-          incoming_json = JSON.parse(message, symbolize_names: true)
+          begin
+            incoming_json = JSON.parse(message, symbolize_names: true)
 
-          incoming_blocks << Block.new(
-            number: incoming_json[:number].to_i,
-            hash: incoming_json[:hash].to_s,
-            nonce: incoming_json[:none].to_i,
-            data: incoming_json[:data].to_s,
-            created_at: Time.parse(incoming_json[:created_at])
-          )
-        rescue JSON::ParserError, ArgumentError => e
-          puts "Incoming block isn't valid: #{e.message}"
+            incoming_blocks << Block.new(
+              number: incoming_json[:number].to_i,
+              hash: incoming_json[:hash].to_s,
+              nonce: incoming_json[:none].to_i,
+              data: incoming_json[:data].to_s,
+              created_at: Time.parse(incoming_json[:created_at])
+            )
+          rescue JSON::ParserError, ArgumentError => e
+            puts "Incoming block isn't valid: #{e.message}"
+          end
         end
       end
     }

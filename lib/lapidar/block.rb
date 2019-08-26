@@ -1,4 +1,4 @@
-module RenuoBlocks
+module Lapidar
   class Block
     attr_reader :number, :hash, :data, :nonce, :created_at
 

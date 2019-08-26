@@ -1,4 +1,4 @@
-module RenuoBlocks
+module Lapidar
   class Chain
     def initialize
       @blocks = []

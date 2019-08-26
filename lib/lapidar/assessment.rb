@@ -1,4 +1,4 @@
-module RenuoBlocks
+module Lapidar
   class Assessment
     def self.valid_link?(previous_block, block)
       hash(previous_block&.hash, block.nonce, block.data) == block.hash

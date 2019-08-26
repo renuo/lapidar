@@ -1,4 +1,4 @@
-module RenuoBlocks
+module Lapidar
   RSpec.describe Block do
     subject(:block) { described_class.new(number: nil, hash: "abcdef", nonce: 0) }
 

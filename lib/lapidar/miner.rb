@@ -1,6 +1,6 @@
 require "digest"
 
-module RenuoBlocks
+module Lapidar
   class Miner
     def initialize
       @stomach = Digest::SHA2.new(256)

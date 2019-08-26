@@ -1,4 +1,4 @@
-module RenuoBlocks
+module Lapidar
   RSpec.describe Miner do
     let(:instance) { described_class.new }
 

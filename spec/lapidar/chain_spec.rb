@@ -1,4 +1,4 @@
-module RenuoBlocks
+module Lapidar
   RSpec.describe Chain do
     let(:instance) { described_class.new }
 
