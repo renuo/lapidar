@@ -11,7 +11,7 @@ module Lapidar
       raise "invalid block" unless valid?(block)
 
       @blocks[block.number] ||= []
-      @blocks[block.number].push(block)
+      @blocks[block.number].push(block) unless @blocks[block.number].map(&:hash).include?(block.hash)
 
       # Rebalance if second to last block has more than one candidate
       rebalance if !contested?(block.number) && contested?(block.number - 1)
