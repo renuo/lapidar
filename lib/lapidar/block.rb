@@ -2,7 +2,7 @@ module Lapidar
   class Block
     attr_reader :number, :hash, :data, :nonce, :created_at
 
-    def initialize(number:, hash:, nonce:, data: nil, created_at: Time.now)
+    def initialize(number:, hash:, nonce:, data: nil, created_at: Time.now.to_f)
       @number = number
       @hash = hash
       @nonce = nonce

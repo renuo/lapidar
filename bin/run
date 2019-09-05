@@ -1,17 +1,64 @@
 #!/usr/bin/env ruby
+Thread.abort_on_exception = true
 
+require "paint"
 require "bundler"
 Bundler.setup(:default)
 
-require_relative '../lib/lapidar'
+require_relative "../lib/lapidar"
 
-puts 'Starting experiment…'
+puts "Starting experiment…"
 
-[
-  Thread.new { Lapidar.start_mining(port: 9999, neighbors: [{ host: 'localhost', port: 9995 }]) },
-  Thread.new { Lapidar.start_mining(port: 9998, neighbors: [{ host: 'localhost', port: 9996 }]) },
-  Thread.new { Lapidar.start_mining(port: 9997, neighbors: [{ host: 'localhost', port: 9997 }]) },
-  Thread.new { Lapidar.start_mining(port: 9996, neighbors: [{ host: 'localhost', port: 9998 }]) },
-  Thread.new { Lapidar.start_mining(port: 9995, neighbors: [{ host: 'localhost', port: 9999 }]) }
-].each(&:join)
+runners = [
+  Lapidar.runner(port: 9999, neighbors: [
+    { host: "localhost", port: 9995 },
+    { host: "localhost", port: 9996 },
+    { host: "localhost", port: 9997 },
+    { host: "localhost", port: 9998 },
+  ]),
+  Lapidar.runner(port: 9998, neighbors: [{ host: "localhost", port: 9996 }]),
+  Lapidar.runner(port: 9997, neighbors: [{ host: "localhost", port: 9997 }]),
+  Lapidar.runner(port: 9996, neighbors: [{ host: "localhost", port: 9998 }]),
+  Lapidar.runner(port: 9995, neighbors: [{ host: "localhost", port: 9999 }])
+]
 
+threads = runners.map { |runner| Thread.new { runner.start } }
+
+logger_thread = Thread.new do
+  sleep(1)
+
+  loop do
+    system("clear")
+
+    colored_blocks_per_runner = runners.each_with_index.map do |runner, runner_number|
+      [
+        "runner #{runner_number}:",
+        *[*0..6].map do |level|
+          runner.chain.instance_variable_get(:@blocks).map do |block_stack|
+            if block_stack[level]
+              if level == 0
+                Paint[block_stack[level].number.to_s, block_stack[level].hash[-6..-1], :bright, :underline]
+              else
+                Paint[block_stack[level].number.to_s, block_stack[level].hash[-6..-1]]
+              end
+            else
+              " " * block_stack[0].number.to_s.length
+            end
+          end.join(" ")
+        end,
+        # runner.chain.instance_variable_get(:@blocks).map do |block_stack|
+        #   block_stack.size
+        # end.join(" "),
+        ""
+      ]
+    end.join("\n")
+
+    puts(colored_blocks_per_runner)
+
+    sleep(1)
+  end
+end
+logger_thread.priority = 100000
+
+threads.each(&:join)
+logger_thread.join

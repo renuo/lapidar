@@ -4,7 +4,7 @@ module Lapidar
 
     describe "#new" do
       it { is_expected.to be_a(Block) }
-      it { is_expected.to have_attributes(created_at: within(0.1).of(Time.now)) }
+      it { is_expected.to have_attributes(created_at: within(0.1).of(Time.now.to_f)) }
     end
 
     describe "#to_h" do
