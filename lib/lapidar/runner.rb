@@ -2,7 +2,7 @@ require "logger"
 
 module Lapidar
   class Runner
-    attr_accessor :chain, :logger
+    attr_accessor :chain, :network_endpoint, :logger
 
     def initialize(network_endpoint)
       @logger = Logger.new(StringIO.new)

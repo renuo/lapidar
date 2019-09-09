@@ -22,6 +22,24 @@ module Lapidar
       @blocks.map { |candidates| candidates&.first }
     end
 
+    def to_colorful_string(depth = 0)
+      [*0..depth].map do |level|
+        @blocks.map do |block_stack|
+          if block_stack[level]
+            number_display = block_stack[level].number.to_s
+            if defined? Paint
+              number_display = Paint[number_display, block_stack[level].hash[-6..-1]] # use last hash digits as color
+              number_display = Paint[number_display, :bright, :underline] if level == 0 # emphasize preferred chain
+              number_display
+            end
+            number_display
+          else
+            " " * block_stack[0].number.to_s.length # padding by digit count
+          end
+        end.join(" ")
+      end.join("\n")
+    end
+
     private
 
     def valid?(block)

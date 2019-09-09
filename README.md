@@ -27,6 +27,8 @@ in race which looks like this:
 
 ![](docs/visualization.png)
 
+To get a colorful output like this you need to install the gem [*paint*](https://github.com/janlelis/paint).
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies.
