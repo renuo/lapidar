@@ -36,5 +36,11 @@ logger_thread = Thread.new do
   end
 end
 
+trap "SIGINT" do
+  puts "Shutting down…"
+  runners.each(&:stop)
+  logger_thread.exit
+end
+
 threads.each(&:join)
 logger_thread.join
