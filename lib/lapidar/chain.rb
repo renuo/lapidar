@@ -1,5 +1,7 @@
 module Lapidar
   class Chain
+    attr_reader :block_stacks
+
     def initialize
       @block_stacks = []
     end

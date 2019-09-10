@@ -29,6 +29,11 @@ in race which looks like this:
 
 To get a colorful output like this you need to install the gem [*paint*](https://github.com/janlelis/paint).
 
+### Persistence
+
+The chain will we loaded from `~/.lapidar/<port>.json` depending on the port
+on which you start the runner. And it will be saved there after you stop the runner.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies.

@@ -7,7 +7,7 @@ module Lapidar
     def initialize(network_endpoint)
       @logger = Logger.new(StringIO.new)
       @network_endpoint = network_endpoint
-      @chain = Chain.new
+      @chain = Persistence.load_chain("#{@network_endpoint.port}.json") || Chain.new
       @incoming_blocks = Queue.new
       @should_stop = nil
       @threads = []
@@ -22,6 +22,8 @@ module Lapidar
 
     def stop
       @should_stop = true
+      Thread.pass
+      Persistence.save_chain("#{@network_endpoint.port}.json", @chain)
       @threads.each(&:exit)
     end
 

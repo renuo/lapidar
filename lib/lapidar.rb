@@ -5,6 +5,7 @@ require_relative "lapidar/assessment"
 require_relative "lapidar/block"
 require_relative "lapidar/chain"
 require_relative "lapidar/miner"
+require_relative "lapidar/persistence"
 require_relative "lapidar/runner"
 require_relative "lapidar/version"
 
