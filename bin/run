@@ -22,7 +22,12 @@ runners = [
   Lapidar.runner(port: 9995, neighbors: [{ host: "localhost", port: 9999 }])
 ]
 
-threads = runners.map { |runner| Thread.new { runner.start } }
+threads = runners.map do |runner|
+  [
+    Thread.new { runner.start },
+    Thread.new { loop { runner.punch_queue << rand.to_s } }
+  ]
+end.flatten
 
 logger_thread = Thread.new do
   sleep(1)

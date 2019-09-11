@@ -25,8 +25,8 @@ module Lapidar
     end
 
     def to_colorful_string(depth = 0)
-      [*0..depth].map do |level|
-        @block_stacks.map do |block_stack|
+      [*0..depth].map { |level|
+        @block_stacks.map { |block_stack|
           if block_stack[level]
             number_display = block_stack[level].number.to_s
             if defined? Paint
@@ -38,8 +38,8 @@ module Lapidar
           else
             " " * block_stack[0].number.to_s.length # padding by digit count
           end
-        end.join(" ")
-      end.join("\n")
+        }.join(" ")
+      }.join("\n")
     end
 
     private

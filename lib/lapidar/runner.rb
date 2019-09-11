@@ -2,13 +2,14 @@ require "logger"
 
 module Lapidar
   class Runner
-    attr_accessor :chain, :network_endpoint, :logger
+    attr_reader :chain, :punch_queue, :network_endpoint, :logger
 
     def initialize(network_endpoint)
       @logger = Logger.new(StringIO.new)
       @network_endpoint = network_endpoint
       @chain = Persistence.load_chain("#{@network_endpoint.port}.json") || Chain.new
       @incoming_blocks = Queue.new
+      @punch_queue = SizedQueue.new(1)
       @should_stop = nil
       @threads = []
     end
@@ -48,7 +49,7 @@ module Lapidar
         miner = Miner.new
         until @should_stop
           begin
-            new_block = miner.mine(@chain.blocks.last)
+            new_block = miner.mine(@chain.blocks.last, @punch_queue.pop)
             @network_endpoint.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
             @incoming_blocks << new_block
             @logger.info("local_producer") { "!" }
