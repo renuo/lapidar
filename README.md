@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/renuo/lapidar.svg?branch=master)](https://travis-ci.org/renuo/lapidar)
+
 # Lapidar
 
 Carve it in stone. Only that these stones are easy to move across the internet.
