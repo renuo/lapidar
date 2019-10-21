@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# $DEBUG = true
 Thread.abort_on_exception = true
 
 require "paint"
@@ -10,22 +11,15 @@ require_relative "../lib/lapidar"
 puts "Starting experiment…"
 
 runners = [
-  Lapidar.runner(port: 9999, neighbors: [
-    { host: "localhost", port: 9995 },
-    { host: "localhost", port: 9996 },
-    { host: "localhost", port: 9997 },
-    { host: "localhost", port: 9998 },
-  ]),
-  Lapidar.runner(port: 9998, neighbors: [{ host: "localhost", port: 9996 }]),
-  Lapidar.runner(port: 9997, neighbors: [{ host: "localhost", port: 9997 }]),
-  Lapidar.runner(port: 9996, neighbors: [{ host: "localhost", port: 9998 }]),
-  Lapidar.runner(port: 9995, neighbors: [{ host: "localhost", port: 9999 }])
+  Lapidar.runner(port: 9999, neighbors: [{ host: "127.0.0.1", port: 9998 }]),
+  Lapidar.runner(port: 9998, neighbors: [{ host: "127.0.0.1", port: 9997 }]),
+  Lapidar.runner(port: 9997, neighbors: [{ host: "127.0.0.1", port: 9999 }])
 ]
 
-threads = runners.map do |runner|
+threads = runners.map.with_index(2) do |runner, i|
   [
-    Thread.new { runner.start },
-    Thread.new { loop { runner.punch_queue << rand.to_s } }
+    Thread.new { sleep(i); runner.start },
+    Thread.new { loop { runner.punch_queue << "#{runner.buschtelefon_endpoint.port} #{rand}" } }
   ]
 end.flatten
 
@@ -35,7 +29,7 @@ logger_thread = Thread.new do
   loop do
     system("clear")
     puts(runners.map do |runner|
-      "Runner on port #{runner.network_endpoint.port}:\n#{runner.chain.to_colorful_string(5)}"
+      "Runner on port #{runner.buschtelefon_endpoint.port}:\n#{runner.chain.to_colorful_string(5)}"
     end.join("\n"))
     sleep(1)
   end
@@ -45,6 +39,13 @@ trap "SIGINT" do
   puts "Shutting down…"
   runners.each(&:stop)
   logger_thread.exit
+end
+
+sleep(5)
+puts 'All inquire their neighbors manually'
+runners.reverse.each do |runner|
+  sleep(1)
+  runner.buschtelefon_endpoint.inquire_remote_neighbors
 end
 
 threads.each(&:join)

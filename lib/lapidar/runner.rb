@@ -2,16 +2,21 @@ require "logger"
 
 module Lapidar
   class Runner
-    attr_reader :chain, :punch_queue, :network_endpoint, :logger
+    attr_reader :chain, :punch_queue, :buschtelefon_endpoint, :logger
 
-    def initialize(network_endpoint)
+    def initialize(buschtelefon_endpoint)
       @logger = Logger.new(StringIO.new)
-      @network_endpoint = network_endpoint
-      @chain = Persistence.load_chain("#{@network_endpoint.port}.json") || Chain.new
+      @buschtelefon_endpoint = buschtelefon_endpoint
+      @chain = Persistence.load_chain("#{@buschtelefon_endpoint.port}.json") || Chain.new
       @incoming_blocks = Queue.new
       @punch_queue = SizedQueue.new(1)
       @should_stop = nil
       @threads = []
+
+      # Reload currently strongest chain into buschtelefon_endpoint
+      if @chain.blocks.any?
+        @buschtelefon_endpoint.load_messages(@chain.blocks.map(&:to_h).map(&:to_json))
+      end
     end
 
     def start
@@ -24,7 +29,7 @@ module Lapidar
     def stop
       @should_stop = true
       Thread.pass
-      Persistence.save_chain("#{@network_endpoint.port}.json", @chain)
+      Persistence.save_chain("#{@buschtelefon_endpoint.port}.json", @chain)
       @threads.each(&:exit)
     end
 
@@ -50,8 +55,13 @@ module Lapidar
         until @should_stop
           begin
             new_block = miner.mine(@chain.blocks.last, @punch_queue.pop)
-            @network_endpoint.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
             @incoming_blocks << new_block
+
+            # We need to let the consumer digest the block, otherwise we maybe mine the same block twice.
+            # Notice that we feed the block into the network soon because adoption is also important.
+            Thread.pass
+
+            @buschtelefon_endpoint.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
             @logger.info("local_producer") { "!" }
           rescue => e
             @logger.debug("local_producer") { "Mint block isn't valid: #{e.message}" }
@@ -63,7 +73,7 @@ module Lapidar
 
     def network_producer
       Thread.new do
-        @network_endpoint.listen do |gossip|
+        @buschtelefon_endpoint.listen do |gossip, gossip_source|
           break if @should_stop
 
           begin

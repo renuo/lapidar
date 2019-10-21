@@ -11,10 +11,12 @@ require_relative "lapidar/version"
 
 module Lapidar
   def self.runner(port:, neighbors:)
-    network_endpoint = Buschtelefon::NetTattler.new(port: port)
-    neighbors.map! { |neighbor_location| Buschtelefon::RemoteTattler.new(neighbor_location) }
-    neighbors.each { |neighbor| network_endpoint.connect(neighbor) }
+    buschtelefon_endpoint = Buschtelefon::NetTattler.new(port: port)
 
-    Runner.new(network_endpoint)
+    neighbors.each do |neighbor_location|
+      buschtelefon_endpoint.connect_remote(neighbor_location)
+    end
+
+    Runner.new(buschtelefon_endpoint)
   end
 end

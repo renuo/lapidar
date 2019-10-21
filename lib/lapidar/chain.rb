@@ -4,22 +4,20 @@ module Lapidar
 
     def initialize
       @block_stacks = []
+      @unconsolidated_blocks = []
     end
 
-    # TODO: Queue up future blocks for later use
     # TODO: Check for duplicates and dont add them to the chains
     def add(block)
-      raise "future block?" if block.number > @block_stacks.count
-      raise "invalid block" unless valid?(block)
-
-      @block_stacks[block.number] ||= []
-      @block_stacks[block.number].push(block) unless @block_stacks[block.number].map(&:hash).include?(block.hash)
-
-      # Rebalance if second to last block has more than one candidate
-      rebalance if !contested?(block.number) && contested?(block.number - 1)
+      if valid?(block)
+        connect(block)
+        consolidate_successors(block)
+      else
+        queue_unconsolidated(block)
+      end
     end
 
-    # For each positition in the chain the candidate positioned first is considered the valid one
+    # For each position in the chain the candidate positioned first is considered the valid one
     def blocks
       @block_stacks.map { |candidates| candidates&.first }
     end
@@ -44,10 +42,19 @@ module Lapidar
 
     private
 
+    def connect(block)
+      @block_stacks[block.number] ||= []
+      @block_stacks[block.number].push(block) unless @block_stacks[block.number].map(&:hash).include?(block.hash)
+
+      # Rebalance if second to last block has more than one candidate
+      rebalance if !contested?(block.number) && contested?(block.number - 1)
+    end
+
     def valid?(block)
       return true if Assessment.genesis?(block) # early valid if genesis
       return false if Assessment.first?(block) # early invalid if fake genesis
       return false unless Assessment.meets_difficulty?(block) # early invalid if difficulty not met
+      return false if block.number > @block_stacks.count # early invalid if future block
 
       # Check if there's an existing parent
       @block_stacks[block.number - 1].any? do |previous_block|
@@ -74,6 +81,24 @@ module Lapidar
     # Contested evaluates to true if there blocks are competing for the same position in the blockchain
     def contested?(block_number)
       @block_stacks[block_number].count > 1
+    end
+
+    def queue_unconsolidated(block)
+      return if @unconsolidated_blocks.include?(block)
+      @unconsolidated_blocks.push(block)
+      @unconsolidated_blocks.sort_by!(&:number)
+    end
+
+    # Check if queued up unconsolidated blocks can be added to the chain after the currently added block
+    def consolidate_successors(head_block)
+      @unconsolidated_blocks
+        .select { |unconsolidated_block| unconsolidated_block.number > head_block.number }
+        .each do |possible_successor|
+          if valid?(possible_successor)
+            connect(possible_successor)
+            @unconsolidated_blocks.delete(possible_successor)
+          end
+        end
     end
   end
 end

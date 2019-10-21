@@ -8,10 +8,32 @@ module Lapidar
     end
 
     describe "#to_h" do
-      subject(:to_h) { block.to_h }
+      subject { block.to_h }
 
       it { is_expected.to be_a(Hash) }
       it { is_expected.to include(:number, :hash, :nonce, :data, :created_at) }
+    end
+
+    describe "#==" do
+      subject { block == other_block }
+
+      context "when compared to itself" do
+        let(:other_block) { block }
+
+        it { is_expected.to be(true) }
+      end
+
+      context "when compared to something different" do
+        let(:other_block) { build(:bible_block) }
+
+        it { is_expected.to be(false) }
+      end
+
+      context "when compared to something with the same attributes" do
+        let(:other_block) { build(:block, block.to_h) }
+
+        it { is_expected.to be(true) }
+      end
     end
   end
 end

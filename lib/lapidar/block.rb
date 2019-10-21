@@ -19,5 +19,9 @@ module Lapidar
         created_at: @created_at,
       }
     end
+
+    def ==(other)
+      to_h == other.to_h
+    end
   end
 end

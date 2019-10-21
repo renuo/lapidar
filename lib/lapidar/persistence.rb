@@ -6,12 +6,12 @@ module Lapidar
 
     def self.save_chain(filename, chain)
       Dir.mkdir(CONFIG_DIR) unless File.exist?(CONFIG_DIR)
-      File.write(File.join(CONFIG_DIR, filename), Oj.dump(chain))
+      File.write(File.join(CONFIG_DIR, filename), Oj.dump(chain, {}))
     end
 
     def self.load_chain(filename)
-      Oj.load(File.read(File.join(CONFIG_DIR, filename)))
-    rescue
+      Oj.load(File.read(File.join(CONFIG_DIR, filename)), {})
+    rescue Errno::ENOENT
       nil
     end
   end
