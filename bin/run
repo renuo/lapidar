@@ -11,9 +11,9 @@ require_relative "../lib/lapidar"
 puts "Starting experiment…"
 
 runners = [
-  Lapidar.runner(port: 9999, neighbors: [{ host: "127.0.0.1", port: 9998 }]),
-  Lapidar.runner(port: 9998, neighbors: [{ host: "127.0.0.1", port: 9997 }]),
-  Lapidar.runner(port: 9997, neighbors: [{ host: "127.0.0.1", port: 9999 }])
+  Lapidar.runner(host: '127.0.0.1', port: 9999, neighbors: [{ host: "127.0.0.1", port: 9998 }]),
+  Lapidar.runner(host: '127.0.0.1', port: 9998, neighbors: [{ host: "127.0.0.1", port: 9997 }]),
+  Lapidar.runner(host: '127.0.0.1', port: 9997, neighbors: [{ host: "127.0.0.1", port: 9999 }])
 ]
 
 threads = runners.map.with_index(2) do |runner, i|

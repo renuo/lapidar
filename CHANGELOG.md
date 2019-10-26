@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+* `Lapidar.runner` now needs to be initialized with a host for socket binding.
+
 ## 0.3.0
 
 * Buschtelefon remote endpoints are now connected via the local endpoint's outbound port

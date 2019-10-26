@@ -8,7 +8,9 @@ RSpec.describe Lapidar do
     end
 
     it "returns a runner" do
-      expect(Lapidar.runner(port: 9999, neighbors: [{host: "example.com", port: 9999}])).to be_a(Lapidar::Runner)
+      expect(
+        Lapidar.runner(host: "127.0.0.1", port: 9999, neighbors: [{host: "example.com", port: 9999}])
+      ).to be_a(Lapidar::Runner)
     end
   end
 end
