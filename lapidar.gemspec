@@ -30,7 +30,7 @@ and evaluates block order and correctness. Build any distributed business logic 
 
   spec.required_ruby_version = ">= 2.3.0"
 
-  spec.add_dependency "buschtelefon", ">= 0.4.1"
+  spec.add_dependency "buschtelefon", ">= 0.5.0"
   spec.add_dependency "oj", ">= 1.0", "< 4"
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "factory_bot", "~> 5.0"

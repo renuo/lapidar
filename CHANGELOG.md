@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+
+* Update [*buschtelefon*](https://github.com/renuo/buschtelefon) to version `0.5`
+  which got a performance bug fixed.
+
 ## 0.4.0
 
 * `Lapidar.runner` now needs to be initialized with a host for socket binding.
