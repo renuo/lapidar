@@ -24,7 +24,7 @@ Or install it yourself as:
 ## Usage
 
 Have a look at [`bin/run`](./bin/run). You'll see that 5 nodes spin up and connect to each other
-via [buschtelefon](https://github.com/renuo/lapidar) and contest each other
+via [buschtelefon](https://github.com/renuo/buschtelefon) and contest each other
 in a race which looks like this:
 
 ![](docs/visualization.png)
