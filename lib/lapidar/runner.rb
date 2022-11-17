@@ -1,22 +1,17 @@
 require "logger"
+require "kafka"
 
 module Lapidar
   class Runner
     attr_reader :chain, :punch_queue, :buschtelefon_endpoint, :logger
 
-    def initialize(buschtelefon_endpoint)
+    def initialize()
       @logger = Logger.new(StringIO.new)
-      @buschtelefon_endpoint = buschtelefon_endpoint
-      @chain = Persistence.load_chain("#{@buschtelefon_endpoint.port}.json") || Chain.new
+      @chain = Persistence.load_chain("chain.json") || Chain.new
       @incoming_blocks = Queue.new
       @punch_queue = SizedQueue.new(1)
       @should_stop = nil
       @threads = []
-
-      # Reload currently strongest chain into buschtelefon_endpoint
-      if @chain.blocks.any?
-        @buschtelefon_endpoint.load_messages(@chain.blocks.map(&:to_h).map(&:to_json))
-      end
     end
 
     def start
@@ -29,7 +24,7 @@ module Lapidar
     def stop
       @should_stop = true
       Thread.pass
-      Persistence.save_chain("#{@buschtelefon_endpoint.port}.json", @chain)
+      Persistence.save_chain("chain.json", @chain)
       @threads.each(&:exit)
     end
 
