@@ -77,6 +77,7 @@ module Lapidar
       Thread.new do
         kafka = Kafka.new(["192.168.1.140:9092"], client_id: "lapidar-client")
         kafka.each_message(topic: "lapidar-events") do |message|
+          puts(message.value)
           incoming_json = JSON.parse(message.value, symbolize_names: true)
 
           @incoming_blocks << Block.new(
@@ -86,7 +87,10 @@ module Lapidar
             data: incoming_json[:data].to_s,
             created_at: incoming_json[:created_at].to_f
           )
+        rescue JSON::ParserError
+          puts "fail"
         end
+
       end
     end
   end
