@@ -82,25 +82,15 @@ module Lapidar
       Thread.new do
         kafka = Kafka.new(["192.168.1.140:9092"], client_id: "lapidar-client")
         kafka.each_message(topic: "lapidar-events") do |message|
-          puts message.value
-        end
+          incoming_json = JSON.parse(message.value, symbolize_names: true)
 
-        @buschtelefon_endpoint.listen do |gossip, gossip_source|
-          break if @should_stop
-
-          begin
-            incoming_json = JSON.parse(gossip.message, symbolize_names: true)
-
-            @incoming_blocks << Block.new(
-              number: incoming_json[:number].to_i,
-              hash: incoming_json[:hash].to_s,
-              nonce: incoming_json[:nonce].to_i,
-              data: incoming_json[:data].to_s,
-              created_at: incoming_json[:created_at].to_f
-            )
-          rescue JSON::ParserError, ArgumentError => e
-            @logger.debug("network_producer") { "Incoming block isn't valid: #{e.message}" }
-          end
+          @incoming_blocks << Block.new(
+            number: incoming_json[:number].to_i,
+            hash: incoming_json[:hash].to_s,
+            nonce: incoming_json[:nonce].to_i,
+            data: incoming_json[:data].to_s,
+            created_at: incoming_json[:created_at].to_f
+          )
         end
       end
     end
