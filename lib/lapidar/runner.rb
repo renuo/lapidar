@@ -49,6 +49,11 @@ module Lapidar
       end
     end
 
+    def publish_block(block)
+      kafka = Kafka.new(["192.168.1.140:9092"], client_id: "lapidar-client")
+      kafka.deliver_message(block.to_json, topic: "lapidar-events")
+    end
+
     def local_producer
       Thread.new do
         miner = Miner.new
@@ -61,7 +66,9 @@ module Lapidar
             # Notice that we feed the block into the network soon because adoption is also important.
             Thread.pass
 
-            @buschtelefon_endpoint.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
+            publish_block(new_block.to_h)
+
+            # @buschtelefon_endpoint.feed(Buschtelefon::Gossip.new(new_block.to_h.to_json))
             @logger.info("local_producer") { "!" }
           rescue => e
             @logger.debug("local_producer") { "Mint block isn't valid: #{e.message}" }
@@ -73,6 +80,11 @@ module Lapidar
 
     def network_producer
       Thread.new do
+        kafka = Kafka.new(["192.168.1.140:9092"], client_id: "lapidar-client")
+        kafka.each_message(topic: "lapidar-events") do |message|
+          puts message.value
+        end
+
         @buschtelefon_endpoint.listen do |gossip, gossip_source|
           break if @should_stop
 
