@@ -54,7 +54,7 @@ module Lapidar
         miner = Miner.new
         until @should_stop
           begin
-            new_block = miner.mine(@chain.blocks.last, @punch_queue.pop)
+            new_block = miner.mine(@chain.blocks.last)
             @incoming_blocks << new_block
 
             # We need to let the consumer digest the block, otherwise we maybe mine the same block twice.
@@ -80,6 +80,7 @@ module Lapidar
           puts(message.value)
           incoming_json = JSON.parse(message.value, symbolize_names: true)
 
+          Thread.pass
           @incoming_blocks << Block.new(
             number: incoming_json[:number].to_i,
             hash: incoming_json[:hash].to_s,
@@ -87,7 +88,7 @@ module Lapidar
             data: incoming_json[:data].to_s,
             created_at: incoming_json[:created_at].to_f
           )
-        rescue JSON::ParserError
+        rescue StandardError
           puts "fail"
         end
 
